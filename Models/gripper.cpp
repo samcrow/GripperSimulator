@@ -2,8 +2,11 @@
 #include <QTransform>
 #include <stdexcept>
 #include <cmath>
+#include <QtMath>
+#include <QDebug>
 
-Gripper::Gripper()
+Gripper::Gripper(QObject* parent) :
+    QObject(parent)
 {
 }
 
@@ -15,6 +18,7 @@ double Gripper::angle() const
 void Gripper::setAngle(double newAngle)
 {
     angle_ = newAngle;
+    emit geometryChanged();
 }
 
 double Gripper::openDistance() const
@@ -33,6 +37,7 @@ void Gripper::setOpenDistance(double newOpenDistance)
     }
 
     openDistance_ = newOpenDistance;
+    emit geometryChanged();
 }
 
 double Gripper::xOffset() const {
@@ -40,22 +45,24 @@ double Gripper::xOffset() const {
 }
 void Gripper::setXOffset(double newOffset) {
     xOffset_ = newOffset;
+    emit geometryChanged();
 }
 double Gripper::yOffset() const {
     return yOffset_;
 }
 void Gripper::setYOffset(double newOffset) {
     yOffset_ = newOffset;
+    emit geometryChanged();
 }
 
 QPointF Gripper::fingertip1Position() const {
     const double halfDistance = openDistance_ / 2;
-    return QPointF(xOffset_ + halfDistance * std::cos(angle_), yOffset_ + halfDistance * std::sin(angle_));
+    return QPointF(xOffset_ + halfDistance * std::cos(angle_), yOffset_ - halfDistance * std::sin(angle_));
 }
 
 QPointF Gripper::fingertip2Position() const {
     const double halfDistance = openDistance_ / 2;
-    return QPointF(xOffset_ + halfDistance * -std::cos(angle_), yOffset_ + halfDistance * -std::sin(angle_));
+    return QPointF(xOffset_ + halfDistance * -std::cos(angle_), yOffset_ + halfDistance * std::sin(angle_));
 }
 
 QPolygonF Gripper::fingertip1Polygon() const {
@@ -65,16 +72,34 @@ QPolygonF Gripper::fingertip1Polygon() const {
     // Create a rectangle with the midpoint of its left side
     // at x = half open distance, y = 0
     // Then rotate it according to the gripper angle
+    // and translate it according to the X and Y offsets
     const double halfDistance = openDistance_ / 2;
-    const QRectF rectangle(halfDistance, -WIDTH / 2, DEPTH, WIDTH);
+    const QRectF rectangle(halfDistance, -WIDTH / 2 , DEPTH, WIDTH);
 
     // Transform
-    const QPolygonF rotatedRectangle = QTransform().rotateRadians(angle_).map(rectangle);
+    const QPolygonF rotatedRectangle = QTransform().translate(xOffset_, yOffset_).rotateRadians(-angle_).map(rectangle);
 
     return rotatedRectangle;
 }
 
 QPolygonF Gripper::fingertip2Polygon() const {
-    // Take the fingertip 1 polygon and rotate it by 180º
-    return QTransform().rotate(180).map(fingertip1Polygon());
+    // Dimensions of a fingertip, in meters
+    constexpr double WIDTH = 0.02;
+    constexpr double DEPTH = 0.01;
+    // Create a rectangle with the midpoint of its left side
+    // at x = half open distance, y = 0
+    // Then rotate it according to the gripper angle
+    // and translate it according to the X and Y offsets
+    const double halfDistance = openDistance_ / 2;
+    const QRectF rectangle(halfDistance, -WIDTH / 2 , DEPTH, WIDTH);
+
+    // Transform
+    const QPolygonF rotatedRectangle = QTransform().translate(xOffset_, yOffset_).rotateRadians(-angle_ - qDegreesToRadians(180.0)).map(rectangle);
+
+    return rotatedRectangle;
+}
+
+QLineF Gripper::infraredBeamLine() const {
+    // Between the two gripper points
+    return QLineF(fingertip1Position(), fingertip2Position());
 }

@@ -19,12 +19,16 @@ SOURCES += main.cpp\
     Models/object.cpp \
     Models/gripper.cpp \
     Models/simulation.cpp \
-    Graphics/simulationdisplaywidget.cpp
+    Graphics/simulationdisplaywidget.cpp \
+    Models/linearvaluechanger.cpp \
+    Models/objectinformation.cpp
 
 HEADERS  += mainwindow.h \
     Models/object.h \
     Models/gripper.h \
     Models/simulation.h \
-    Graphics/simulationdisplaywidget.h
+    Graphics/simulationdisplaywidget.h \
+    Models/linearvaluechanger.h \
+    Models/objectinformation.h
 
 FORMS    += mainwindow.ui

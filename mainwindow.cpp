@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
 
 MainWindow::MainWindow(Simulation* simulation, QWidget *parent) :
     QMainWindow(parent),
@@ -8,6 +9,7 @@ MainWindow::MainWindow(Simulation* simulation, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->simulationDisplay->setSimulation(simulation);
+    ui->rightPane->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -15,47 +17,65 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_rotateRightButton_clicked()
-{
-    simulation->rotateGripperRight();
-    ui->simulationDisplay->repaint();
-}
 
-void MainWindow::on_rotateLeftButton_clicked()
-{
-    simulation->rotateGripperLeft();
-    ui->simulationDisplay->repaint();
-}
 
-void MainWindow::on_openButton_clicked()
+void MainWindow::on_leftButton_pressed()
 {
-    simulation->openGripperSomewhat();
-    ui->simulationDisplay->repaint();
+    simulation->startMovingGripperLeft();
 }
-
-void MainWindow::on_closeButton_clicked()
+void MainWindow::on_leftButton_released()
 {
-    simulation->closeGripperSomewhat();
-    ui->simulationDisplay->repaint();
+    simulation->stopMovingGripperHorizontally();
 }
-
-void MainWindow::on_upButton_clicked()
+void MainWindow::on_rightButton_pressed()
 {
-    simulation->nudgeGripperUp();
-    ui->simulationDisplay->repaint();
+    simulation->startMovingGripperRight();
 }
-void MainWindow::on_downButton_clicked()
+void MainWindow::on_rightButton_released()
 {
-    simulation->nudgeGripperDown();
-    ui->simulationDisplay->repaint();
+    simulation->stopMovingGripperHorizontally();
 }
-void MainWindow::on_leftButton_clicked()
+void MainWindow::on_upButton_pressed()
 {
-    simulation->nudgeGripperLeft();
-    ui->simulationDisplay->repaint();
+    simulation->startMovingGripperUp();
 }
-void MainWindow::on_rightButton_clicked()
+void MainWindow::on_upButton_released()
 {
-    simulation->nudgeGripperRight();
-    ui->simulationDisplay->repaint();
+    simulation->stopMovingGripperVertically();
+}
+void MainWindow::on_downButton_pressed()
+{
+    simulation->startMovingGripperDown();
+}
+void MainWindow::on_downButton_released()
+{
+    simulation->stopMovingGripperVertically();
+}
+void MainWindow::on_rotateLeftButton_pressed()
+{
+    simulation->startRotatingGripperCounterclockwise();
+}
+void MainWindow::on_rotateLeftButton_released()
+{
+    simulation->stopRotatingGripper();
+}
+void MainWindow::on_rotateRightButton_pressed()
+{
+    simulation->startRotatingGripperClockwise();
+}
+void MainWindow::on_rotateRightButton_released()
+{
+    simulation->stopRotatingGripper();
+}
+void MainWindow::on_openButton_pressed() {
+    simulation->startOpeningGripper();
+}
+void MainWindow::on_openButton_released() {
+    simulation->stopOpeningClosingGripper();
+}
+void MainWindow::on_closeButton_pressed() {
+    simulation->startClosingGripper();
+}
+void MainWindow::on_closeButton_released() {
+    simulation->stopOpeningClosingGripper();
 }

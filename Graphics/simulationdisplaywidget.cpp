@@ -10,6 +10,7 @@ SimulationDisplayWidget::SimulationDisplayWidget(QWidget *parent) :
 
 void SimulationDisplayWidget::setSimulation(Simulation *simulation) {
     this->simulation = simulation;
+    connect(this->simulation, SIGNAL(changed()), this, SLOT(repaint()));
 }
 
 void SimulationDisplayWidget::paintEvent(QPaintEvent *)
@@ -23,27 +24,33 @@ void SimulationDisplayWidget::paintEvent(QPaintEvent *)
         const double centerX = this->width() / 2;
         const double centerY = this->height() / 2;
         const double SCALE = smallerDimension / 0.15;
-        // Make the vertical scale negative so that everything is flipped vertically
-        // to translate from the model coordinate system with the origin at bottom left
-        // to the widget coordinate system with the origin at top left
-        const QTransform transform = QTransform().translate(centerX, centerY).scale(SCALE, -SCALE);
 
-        // Create a transform that incorporates the gripper position offsets
-        const QTransform gripperTransform = QTransform(transform).translate(simulation->gripper()->xOffset(), simulation->gripper()->yOffset());
+        const QTransform transform = QTransform().translate(centerX, centerY).scale(SCALE, SCALE);
+
+        // Draw the object information bitmap
+        const QBitmap& objectBitmap = simulation->objectInformation()->bitmap();
+        const QRect bitmapRegion = transform.map(QRectF(-0.1, -0.1, 0.2, 0.2)).boundingRect().toRect();
+        painter.drawPixmap(bitmapRegion, objectBitmap);
+
         // Draw points for the fingertip locations
         painter.setPen(Qt::NoPen);
-        painter.setBrush(Qt::black);
-        painter.drawEllipse(gripperTransform.map(simulation->gripper()->fingertip1Position()), 2, 2);
-        painter.drawEllipse(gripperTransform.map(simulation->gripper()->fingertip2Position()), 2, 2);
+        painter.setBrush(Qt::green);
+        painter.drawEllipse(transform.map(simulation->gripper()->fingertip1Position()), 2, 2);
+        painter.drawEllipse(transform.map(simulation->gripper()->fingertip2Position()), 2, 2);
 
 
         // Draw the fingertips
-        painter.setPen(Qt::green);
-        painter.drawPolyline(gripperTransform.map(simulation->gripper()->fingertip1Polygon()));
-        painter.drawPolyline(gripperTransform.map(simulation->gripper()->fingertip2Polygon()));
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(Qt::gray);
+        painter.drawPolygon(transform.map(simulation->gripper()->fingertip1Polygon()));
+        painter.drawPolygon(transform.map(simulation->gripper()->fingertip2Polygon()));
 
         // Draw the object
-        painter.setPen(Qt::black);
-        painter.drawPolyline(transform.map(simulation->object()->polygon()));
+        painter.setBrush(Qt::red);
+        painter.drawPolygon(transform.map(simulation->object()->polygon()));
+
+        // Draw the infrared beam
+        painter.setPen(Qt::red);
+        painter.drawLine(transform.map(simulation->gripper()->infraredBeamLine()));
     }
 }

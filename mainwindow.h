@@ -17,18 +17,25 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_rotateRightButton_clicked();
 
-    void on_rotateLeftButton_clicked();
 
-    void on_openButton_clicked();
 
-    void on_closeButton_clicked();
-
-    void on_upButton_clicked();
-    void on_downButton_clicked();
-    void on_leftButton_clicked();
-    void on_rightButton_clicked();
+    void on_leftButton_pressed();
+    void on_leftButton_released();
+    void on_rightButton_pressed();
+    void on_rightButton_released();
+    void on_upButton_pressed();
+    void on_upButton_released();
+    void on_downButton_pressed();
+    void on_downButton_released();
+    void on_rotateLeftButton_pressed();
+    void on_rotateLeftButton_released();
+    void on_rotateRightButton_pressed();
+    void on_rotateRightButton_released();
+    void on_openButton_pressed();
+    void on_openButton_released();
+    void on_closeButton_pressed();
+    void on_closeButton_released();
 
 private:
     Ui::MainWindow *ui;
