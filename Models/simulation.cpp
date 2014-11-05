@@ -3,7 +3,9 @@
 #include <QtMath>
 
 Simulation::Simulation(QObject* parent) :
-    QObject(parent)
+    QObject(parent),
+    scoreCalculator_(gripper_, info_),
+    scripting(*this)
 {
     // Test
 
@@ -17,6 +19,9 @@ Simulation::Simulation(QObject* parent) :
     connect(&yChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setYOffset(newValue); });
     connect(&openChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setOpenDistance(newValue); });
     connect(&angleChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setAngle(newValue); });
+
+    connect(&gripper_, &Gripper::geometryChanged, &scoreCalculator_, &ScoreCalculator::gripperGeometryChanged);
+    connect(&scoreCalculator_, &ScoreCalculator::scoreChanged, this, &Simulation::emitScoreChanged);
 }
 
 void Simulation::rotateGripperLeft() {
@@ -109,16 +114,28 @@ void Simulation::stopOpeningClosingGripper() {
     openChanger.pause();
 }
 
-Gripper* Simulation::gripper() {
-    return &gripper_;
+Gripper& Simulation::gripper() {
+    return gripper_;
 }
 
-Object* Simulation::object() {
-    return &object_;
+Object& Simulation::object() {
+    return object_;
 }
 
-ObjectInformation* Simulation::objectInformation() {
-    return &info_;
+ObjectInformation& Simulation::objectInformation() {
+    return info_;
+}
+
+ScoreCalculator& Simulation::scoreCalculator() {
+    return scoreCalculator_;
+}
+
+JavaScriptEvaluator& Simulation::scriptEvaluator() {
+    return scripting;
+}
+
+bool Simulation::isBeamBlocked() const {
+    return beamBlocked_;
 }
 
 void Simulation::check() {
@@ -156,9 +173,11 @@ void Simulation::checkCollisions() {
 void Simulation::checkInfraredBeam() {
     if(object_.hitsObject(gripper_.infraredBeamLine())) {
         // Blocked
+        beamBlocked_ = true;
     }
     else {
         // Clear
+        beamBlocked_ = false;
         info_.markClear(gripper_.infraredBeamLine());
     }
 }

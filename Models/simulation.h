@@ -5,6 +5,8 @@
 #include "gripper.h"
 #include "object.h"
 #include "objectinformation.h"
+#include "scorecalculator.h"
+#include "../JavaScript/javascriptevaluator.h"
 
 /**
  * Contains all components of the simulation.
@@ -21,9 +23,14 @@ class Simulation : public QObject
 public:
     Simulation(QObject* parent = 0);
 
-    Gripper* gripper();
-    Object* object();
-    ObjectInformation* objectInformation();
+    Gripper& gripper();
+    Object& object();
+    ObjectInformation& objectInformation();
+    ScoreCalculator& scoreCalculator();
+    JavaScriptEvaluator& scriptEvaluator();
+
+    /// Returns whether the infrared beam is blocked by an object
+    bool isBeamBlocked() const;
 
 public slots:
     void rotateGripperRight();
@@ -50,20 +57,30 @@ public slots:
     void startClosingGripper();
     void stopOpeningClosingGripper();
 
+private slots:
+
+    inline void emitScoreChanged() { emit scoreChanged(); }
 
 signals:
 
     void changed();
 
+    void scoreChanged();
+
 private:
     Gripper gripper_;
     Object object_;
     ObjectInformation info_;
+    ScoreCalculator scoreCalculator_;
+
+    JavaScriptEvaluator scripting;
 
     LinearValueChanger xChanger;
     LinearValueChanger yChanger;
     LinearValueChanger angleChanger;
     LinearValueChanger openChanger;
+
+    bool beamBlocked_ = true;
 
     /// Gripper move rate, meters/second
     static constexpr double MOVE_RATE = 0.01;

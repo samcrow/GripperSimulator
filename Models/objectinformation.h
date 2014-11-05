@@ -16,14 +16,14 @@ class ObjectInformation
 public:
     ObjectInformation();
 
-    const QBitmap& bitmap() const;
+    const QImage& bitmap() const;
 
     void markClear(const QPolygonF& polygon);
     void markClear(const QLineF& line);
 
 private:
 
-    QBitmap bitmap_;
+    QImage bitmap_;
     const QTransform transform;
 };
 

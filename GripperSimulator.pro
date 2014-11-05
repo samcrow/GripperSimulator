@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui script
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,7 +21,11 @@ SOURCES += main.cpp\
     Models/simulation.cpp \
     Graphics/simulationdisplaywidget.cpp \
     Models/linearvaluechanger.cpp \
-    Models/objectinformation.cpp
+    Models/objectinformation.cpp \
+    Models/scorecalculator.cpp \
+    JavaScript/javascriptgripper.cpp \
+    JavaScript/javascriptevaluator.cpp \
+    JavaScript/javascriptconsole.cpp
 
 HEADERS  += mainwindow.h \
     Models/object.h \
@@ -29,6 +33,11 @@ HEADERS  += mainwindow.h \
     Models/simulation.h \
     Graphics/simulationdisplaywidget.h \
     Models/linearvaluechanger.h \
-    Models/objectinformation.h
+    Models/objectinformation.h \
+    Models/scorecalculator.h \
+    JavaScript/javascriptgripper.h \
+    JavaScript/javascriptevaluator.h \
+    JavaScript/javascriptconsole.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    JavaScript/javascriptconsole.ui

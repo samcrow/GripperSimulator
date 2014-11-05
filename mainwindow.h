@@ -37,10 +37,16 @@ private slots:
     void on_closeButton_pressed();
     void on_closeButton_released();
 
+    void on_testButton_clicked();
+
+    void on_openScriptAction_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     Simulation* simulation;
+
+    void updateScoreDisplay();
 };
 
 #endif // MAINWINDOW_H

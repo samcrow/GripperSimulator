@@ -4,13 +4,15 @@
 ObjectInformation::ObjectInformation() :
     // A 200x200 bitmap for a 20x20 centimeter area
     // 1 pixel per millimeter
-    bitmap_(200, 200),
+    // Format_Mono creates a binary 1-bit-per-pixel image
+    bitmap_(200, 200, QImage::Format_Mono),
     transform(QTransform().translate(bitmap_.width() / 2.0, bitmap_.height() / 2.0).scale(1000, 1000))
 {
-    bitmap_.fill(Qt::black);
+    // Fill the image with black. Using Qt::black does not work with Format_Mono.
+    bitmap_.fill(0);
 }
 
-const QBitmap& ObjectInformation::bitmap() const {
+const QImage& ObjectInformation::bitmap() const {
     return bitmap_;
 }
 

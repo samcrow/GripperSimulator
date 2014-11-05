@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "JavaScript/javascriptevaluator.h"
+#include <sstream>
 #include <QDebug>
+#include <QFileDialog>
 
 MainWindow::MainWindow(Simulation* simulation, QWidget *parent) :
     QMainWindow(parent),
@@ -10,6 +13,17 @@ MainWindow::MainWindow(Simulation* simulation, QWidget *parent) :
     ui->setupUi(this);
     ui->simulationDisplay->setSimulation(simulation);
     ui->rightPane->setVisible(false);
+    ui->console->setScriptEngine(&simulation->scriptEvaluator().engine());
+
+    connect(simulation, &Simulation::scoreChanged, this, &MainWindow::updateScoreDisplay);
+
+    updateScoreDisplay();
+}
+
+void MainWindow::updateScoreDisplay() {
+    std::stringstream stream;
+    stream << "Total score " << simulation->scoreCalculator().netScore() << " (movement " << simulation->scoreCalculator().movementScore() << ", information " << simulation->scoreCalculator().informationScore() << ")";
+    ui->statusBar->showMessage(QString::fromStdString(stream.str()));
 }
 
 MainWindow::~MainWindow()
@@ -78,4 +92,22 @@ void MainWindow::on_closeButton_pressed() {
 }
 void MainWindow::on_closeButton_released() {
     simulation->stopOpeningClosingGripper();
+}
+
+void MainWindow::on_testButton_clicked()
+{
+    if(simulation->scriptEvaluator().hasScriptFile()) {
+        const QScriptValue result = simulation->scriptEvaluator().executeScriptFile();
+        if(result.isError()) {
+            ui->statusBar->showMessage(result.toString(), 1000);
+        }
+    }
+}
+
+void MainWindow::on_openScriptAction_triggered()
+{
+    const QString path = QFileDialog::getOpenFileName(this, "Open a script file", QDir::homePath(), "JavaScript files (*.js)");
+    if(!path.isEmpty()) {
+        simulation->scriptEvaluator().setScriptFile(path);
+    }
 }

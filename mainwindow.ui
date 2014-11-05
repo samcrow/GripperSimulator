@@ -17,8 +17,8 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -48,7 +48,7 @@
       </layout>
      </widget>
     </item>
-    <item>
+    <item row="0" column="1">
      <widget class="QWidget" name="rightPane" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -128,6 +128,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="testButton">
+         <property name="text">
+          <string>Run script</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -142,6 +149,9 @@
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="JavaScriptConsole" name="console" native="true"/>
     </item>
    </layout>
   </widget>
@@ -160,6 +170,13 @@
     </property>
     <addaction name="actionControls"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="openScriptAction"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -175,6 +192,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="openScriptAction"/>
    <addaction name="actionControls"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -189,6 +207,25 @@
     <string>Toggles the visibility of the manual controls</string>
    </property>
   </action>
+  <action name="openScriptAction">
+   <property name="text">
+    <string>Open Script...</string>
+   </property>
+   <property name="toolTip">
+    <string>Opens a script file to be executed</string>
+   </property>
+  </action>
+  <action name="runScriptAction">
+   <property name="text">
+    <string>Run script</string>
+   </property>
+   <property name="toolTip">
+    <string>Runs the script that has been loaded</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -196,6 +233,12 @@
    <class>SimulationDisplayWidget</class>
    <extends>QWidget</extends>
    <header>Graphics/simulationdisplaywidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JavaScriptConsole</class>
+   <extends>QWidget</extends>
+   <header>JavaScript/javascriptconsole.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
