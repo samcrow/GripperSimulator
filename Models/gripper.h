@@ -56,6 +56,10 @@ public:
      */
     QLineF infraredBeamLine() const;
 
+public slots:
+
+	void reset();
+
 signals:
     void geometryChanged();
 

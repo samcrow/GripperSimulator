@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/shapes">
+        <file alias="square.shape">test/shapes/square.shape</file>
+        <file alias="triangle.shape">test/shapes/triangle.shape</file>
+    </qresource>
+</RCC>

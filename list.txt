@@ -1,0 +1,12 @@
+
+Investigate:
+
+✓ Moving the gripper in a coordinate system based on its rotation
+
+✓ Loading a bitmap for the object (not currently implemented as a bitmap)
+
+Script for edge/corner finding
+
+Script for reconstructing convex objects
+
+Test scripts on a variety of objects

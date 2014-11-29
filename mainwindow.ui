@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Gripper Simulator</string>
   </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
   </property>
@@ -21,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -128,7 +131,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="testButton">
+        <widget class="QPushButton" name="runScriptButton">
          <property name="text">
           <string>Run script</string>
          </property>
@@ -174,26 +177,12 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen_shape"/>
     <addaction name="openScriptAction"/>
+    <addaction name="runScriptAction"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <property name="movable">
-    <bool>false</bool>
-   </property>
-   <property name="floatable">
-    <bool>false</bool>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="openScriptAction"/>
-   <addaction name="actionControls"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionControls">
@@ -214,6 +203,9 @@
    <property name="toolTip">
     <string>Opens a script file to be executed</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="runScriptAction">
    <property name="text">
@@ -224,6 +216,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionOpen_shape">
+   <property name="text">
+    <string>Open shape...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
  </widget>

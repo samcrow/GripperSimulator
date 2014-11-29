@@ -103,3 +103,11 @@ QLineF Gripper::infraredBeamLine() const {
     // Between the two gripper points
     return QLineF(fingertip1Position(), fingertip2Position());
 }
+
+void Gripper::reset() {
+	angle_ = 0;
+	openDistance_ = MAX_OPEN_DISTANCE;
+	xOffset_ = 0;
+	yOffset_ = 0;
+	emit geometryChanged();
+}

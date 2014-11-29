@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <stdexcept>
 #include <QCoreApplication>
+#include <chrono>
 
 JavaScriptEvaluator::JavaScriptEvaluator(Simulation &simulation) :
     gripper(simulation)
@@ -54,5 +55,18 @@ void JavaScriptEvaluator::yield() {
 }
 
 void JavaScriptEvaluator::sleep(int milliseconds) {
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents, milliseconds);
+
+    typedef std::chrono::high_resolution_clock clock;
+    typedef clock::time_point time_point;
+
+    const time_point start = clock::now();
+    const time_point end = start + std::chrono::milliseconds(milliseconds);
+
+    time_point now = start;
+    while(now < end) {
+        const int remainingMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>( end - now ).count();
+        QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents, remainingMilliseconds);
+
+        now = clock::now();
+    }
 }

@@ -16,6 +16,17 @@
  * The gripper starts centered on (0, 0) with angle 0,
  * which means that fingertip 1 points in the +X direction
  * and fingertip 2 points in the -X direction.
+ *
+ * The gripper can be moved in two coordinate systems:
+ * The global coordinate system has its origin at the center of the region.
+ * Positive X points to the right, and positive Y points down.
+ *
+ * The gripper-local coordinate system does not have location values,
+ * but it can be used to move the gripper.
+ * The gripper-local positive U axis points from the center of the gripper towards
+ * fingertip 1.
+ * The gripper-local positive V axis points 90 degrees counterclockwise of the gripper-
+ * local positive U axis.
  */
 class Simulation : public QObject
 {
@@ -35,8 +46,8 @@ public:
 public slots:
     void rotateGripperRight();
     void rotateGripperLeft();
-    void openGripperSomewhat();
-    void closeGripperSomewhat();
+    void nudgeGripperOpen();
+    void nudgeGripperClosed();
     void nudgeGripperUp();
     void nudgeGripperDown();
     void nudgeGripperLeft();
@@ -44,10 +55,15 @@ public slots:
 
     void startMovingGripperUp();
     void startMovingGripperDown();
-    void stopMovingGripperVertically();
     void startMovingGripperLeft();
     void startMovingGripperRight();
-    void stopMovingGripperHorizontally();
+
+    void startMovingGripperPositiveU();
+    void startMovingGripperNegativeU();
+    void startMovingGripperPositiveV();
+    void startMovingGripperNegativeV();
+
+    void stopMovingGripper();
 
     void startRotatingGripperClockwise();
     void startRotatingGripperCounterclockwise();
@@ -56,6 +72,17 @@ public slots:
     void startOpeningGripper();
     void startClosingGripper();
     void stopOpeningClosingGripper();
+
+    /**
+     * Moves the gripper to the center. Returns
+     * when the move is complete.
+     */
+    void moveGripperToCenter();
+
+	/**
+	 * Resets the gripper position and object information
+	 */
+	void reset();
 
 private slots:
 

@@ -30,3 +30,7 @@ void ObjectInformation::markClear(const QLineF& line)
     painter.setPen(Qt::white);
     painter.drawLine(transform.map(line));
 }
+
+void ObjectInformation::reset() {
+	bitmap_.fill(0);
+}

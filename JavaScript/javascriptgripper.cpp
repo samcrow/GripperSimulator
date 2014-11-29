@@ -41,6 +41,21 @@ void JavaScriptGripper::startMovingUp() {
 void JavaScriptGripper::startMovingDown() {
     simulation.startMovingGripperDown();
 }
+
+void JavaScriptGripper::startMovingPositiveU() {
+    simulation.startMovingGripperPositiveU();
+}
+void JavaScriptGripper::startMovingNegativeU() {
+    simulation.startMovingGripperNegativeU();
+}
+
+void JavaScriptGripper::startMovingPositiveV() {
+    simulation.startMovingGripperPositiveV();
+}
+void JavaScriptGripper::startMovingNegativeV() {
+    simulation.startMovingGripperNegativeV();
+}
+
 double JavaScriptGripper::getAngle() const {
     return gripper.angle();
 }
@@ -65,9 +80,10 @@ bool JavaScriptGripper::isBeamBlocked() const {
     return simulation.isBeamBlocked();
 }
 
+void JavaScriptGripper::moveToCenter() {
+    simulation.moveGripperToCenter();
+}
+
 void JavaScriptGripper::stop() {
-    simulation.stopOpeningClosingGripper();
-    simulation.stopMovingGripperHorizontally();
-    simulation.stopMovingGripperVertically();
-    simulation.stopRotatingGripper();
+    simulation.stopMovingGripper();
 }

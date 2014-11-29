@@ -21,6 +21,10 @@ public:
     void markClear(const QPolygonF& polygon);
     void markClear(const QLineF& line);
 
+public slots:
+
+	void reset();
+
 private:
 
     QImage bitmap_;

@@ -46,8 +46,15 @@ public slots:
     void startMovingUp();
     void startMovingDown();
 
+    void startMovingPositiveU();
+    void startMovingNegativeU();
+    void startMovingPositiveV();
+    void startMovingNegativeV();
+
     void startRotatingCounterclockwise();
     void startRotatingClockwise();
+
+    void moveToCenter();
 
     void stop();
 

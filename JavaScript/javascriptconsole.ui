@@ -43,10 +43,16 @@
    <item row="0" column="0">
     <widget class="QPlainTextEdit" name="historyView">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
      </property>
      <property name="undoRedoEnabled">
       <bool>false</bool>

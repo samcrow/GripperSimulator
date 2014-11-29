@@ -1,17 +1,21 @@
 #include "simulation.h"
+#include "../IO/objectio.h"
 #include <QDebug>
+#include <QFile>
 #include <QtMath>
+#include <QCoreApplication>
+#include <cmath>
+#include <type_traits>
 
 Simulation::Simulation(QObject* parent) :
     QObject(parent),
     scoreCalculator_(gripper_, info_),
     scripting(*this)
 {
-    // Test
-
-    // Set up the object as a square
-    constexpr double SQUARE_HALF_SIDE_LENGTH = 0.01;
-    object_.polygon() = QPolygonF(QRectF(-SQUARE_HALF_SIDE_LENGTH, -SQUARE_HALF_SIDE_LENGTH, 2 * SQUARE_HALF_SIDE_LENGTH, 2 * SQUARE_HALF_SIDE_LENGTH));
+	// Load a shape
+	QFile shapeFile(":/shapes/triangle.shape");
+	shapeFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	object_.polygon() = ObjectIO::readPolygon(&shapeFile);
 
     connect(&gripper_, &Gripper::geometryChanged, this, &Simulation::check);
 
@@ -30,7 +34,7 @@ void Simulation::rotateGripperLeft() {
 void Simulation::rotateGripperRight() {
     gripper_.setAngle(gripper_.angle() - qDegreesToRadians(10.0));
 }
-void Simulation::openGripperSomewhat() {
+void Simulation::nudgeGripperOpen() {
     try {
         gripper_.setOpenDistance(gripper_.openDistance() + 0.01);
     }
@@ -38,7 +42,7 @@ void Simulation::openGripperSomewhat() {
 
     }
 }
-void Simulation::closeGripperSomewhat() {
+void Simulation::nudgeGripperClosed() {
     try {
         gripper_.setOpenDistance(gripper_.openDistance() - 0.01);
     }
@@ -71,8 +75,11 @@ void Simulation::startMovingGripperDown() {
     yChanger.setRate(MOVE_RATE);
     yChanger.start();
 }
-void Simulation::stopMovingGripperVertically() {
+void Simulation::stopMovingGripper() {
+    xChanger.pause();
     yChanger.pause();
+    angleChanger.pause();
+    openChanger.pause();
 }
 void Simulation::startMovingGripperLeft() {
     xChanger.setValue(gripper_.xOffset());
@@ -84,9 +91,67 @@ void Simulation::startMovingGripperRight() {
     xChanger.setRate(MOVE_RATE);
     xChanger.start();
 }
-void Simulation::stopMovingGripperHorizontally() {
-    xChanger.pause();
+
+void Simulation::startMovingGripperPositiveU() {
+    xChanger.setValue(gripper_.xOffset());
+    yChanger.setValue(gripper_.yOffset());
+    // Calculate X and Y components
+    // Positive U is in the fingertip 1 direction
+    const double xPart = MOVE_RATE * std::cos(gripper_.angle());
+    const double yPart = -MOVE_RATE * std::sin(gripper_.angle());
+
+    xChanger.setRate(xPart);
+    yChanger.setRate(yPart);
+
+    xChanger.start();
+    yChanger.start();
 }
+
+void Simulation::startMovingGripperNegativeU() {
+    xChanger.setValue(gripper_.xOffset());
+    yChanger.setValue(gripper_.yOffset());
+    // Calculate X and Y components
+    // Negative U is in the fingertip 2 direction
+    const double xPart = MOVE_RATE * std::cos(gripper_.angle() + qDegreesToRadians(180.0));
+    const double yPart = -MOVE_RATE * std::sin(gripper_.angle() + qDegreesToRadians(180.0));
+
+    xChanger.setRate(xPart);
+    yChanger.setRate(yPart);
+
+    xChanger.start();
+    yChanger.start();
+}
+
+void Simulation::startMovingGripperPositiveV() {
+    xChanger.setValue(gripper_.xOffset());
+    yChanger.setValue(gripper_.yOffset());
+    // Calculate X and Y components
+    // Positive V is 90º counterclockwise of the fingertip 1 direction
+    const double xPart = MOVE_RATE * std::cos(gripper_.angle() + qDegreesToRadians(90.0));
+    const double yPart = -MOVE_RATE * std::sin(gripper_.angle() + qDegreesToRadians(90.0));
+
+    xChanger.setRate(xPart);
+    yChanger.setRate(yPart);
+
+    xChanger.start();
+    yChanger.start();
+}
+
+void Simulation::startMovingGripperNegativeV() {
+    xChanger.setValue(gripper_.xOffset());
+    yChanger.setValue(gripper_.yOffset());
+    // Calculate X and Y components
+    // Positive V is 90º counterclockwise of the fingertip 2 direction
+    const double xPart = MOVE_RATE * std::cos(gripper_.angle() + qDegreesToRadians(270.0));
+    const double yPart = -MOVE_RATE * std::sin(gripper_.angle() + qDegreesToRadians(270.0));
+
+    xChanger.setRate(xPart);
+    yChanger.setRate(yPart);
+
+    xChanger.start();
+    yChanger.start();
+}
+
 void Simulation::startRotatingGripperCounterclockwise() {
     angleChanger.setValue(gripper_.angle());
     angleChanger.setRate(ROTATE_RATE);
@@ -112,6 +177,36 @@ void Simulation::startClosingGripper() {
 }
 void Simulation::stopOpeningClosingGripper() {
     openChanger.pause();
+}
+
+void Simulation::moveGripperToCenter() {
+    // Set X and Y rates to arrive at the center simultaneously
+    const double angle = std::atan2(gripper_.yOffset(), gripper_.xOffset());
+    const double xRate = -MOVE_RATE * std::cos(angle);
+    const double yRate = -MOVE_RATE * std::sin(angle);
+    xChanger.setRate(xRate);
+    xChanger.setValue(gripper_.xOffset());
+    yChanger.setRate(yRate);
+    yChanger.setValue(gripper_.yOffset());
+
+    xChanger.start();
+    yChanger.start();
+
+    // Check for a return to zero
+    bool xDone = false;
+    bool yDone = false;
+    while(!xDone && !yDone) {
+        if(std::abs(gripper_.xOffset()) <= 0.001) {
+            xDone = true;
+            xChanger.pause();
+        }
+        if(std::abs(gripper_.yOffset()) <= 0.001) {
+            yDone = true;
+            yChanger.pause();
+        }
+        QCoreApplication::processEvents();
+    }
+    stopMovingGripper();
 }
 
 Gripper& Simulation::gripper() {
@@ -195,5 +290,10 @@ bool Simulation::collides(const QPolygonF& p1, const QPolygonF& p2) {
         }
     }
     return false;
+}
+
+void Simulation::reset() {
+	gripper_.reset();
+	info_.reset();
 }
 

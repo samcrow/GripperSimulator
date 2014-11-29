@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
 #include "Models/simulation.h"
 
 namespace Ui {
@@ -37,16 +38,24 @@ private slots:
     void on_closeButton_pressed();
     void on_closeButton_released();
 
-    void on_testButton_clicked();
+	void on_runScriptButton_clicked();
 
     void on_openScriptAction_triggered();
+
+	void on_runScriptAction_triggered();
+
+	void on_actionOpen_shape_triggered();
 
 private:
     Ui::MainWindow *ui;
 
     Simulation* simulation;
+	QSettings settings;
 
     void updateScoreDisplay();
+
+	void openScriptFile();
+	void openShapeFile();
 };
 
 #endif // MAINWINDOW_H
