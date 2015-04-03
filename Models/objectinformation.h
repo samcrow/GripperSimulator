@@ -21,6 +21,8 @@ public:
     void markClear(const QPolygonF& polygon);
     void markClear(const QLineF& line);
 
+	int countPixels(const QPolygonF& polygon) const;
+
 public slots:
 
 	void reset();

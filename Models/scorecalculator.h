@@ -20,7 +20,7 @@ class ScoreCalculator : public QObject
 {
     Q_OBJECT
 public:
-    ScoreCalculator(Gripper& gripper, ObjectInformation& objectInfo, QObject* parent = 0);
+	ScoreCalculator(Gripper& gripper, ObjectInformation& objectInfo, QObject* parent = 0);
 
     /// Returns the movement score
     int movementScore() const;
@@ -28,6 +28,8 @@ public:
     int informationScore() const;
     /// Returns the result of subtracting the movement score from the information score
     int netScore() const;
+
+	int pixels() const;
 
 signals:
 
@@ -54,15 +56,19 @@ private:
     double oldGripperY = 0;
     double oldGripperAngle = 0;
 
-    Gripper& gripper;
-    ObjectInformation& objectInfo;
+	Gripper& gripper;
+	ObjectInformation& objectInfo;
 
     double movementScore_ = 0;
     double informationScore_ = 0;
+	double contPixels_ = 0;
 
     void updateMovmementScore();
     void updateInformationScore();
+	void updatePixels();
 
+
+	bool isWhite(QRgb color);
 };
 
 #endif // SCORECALCULATOR_H

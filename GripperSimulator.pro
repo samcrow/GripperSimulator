@@ -26,7 +26,10 @@ SOURCES += main.cpp\
     JavaScript/javascriptgripper.cpp \
     JavaScript/javascriptevaluator.cpp \
     JavaScript/javascriptconsole.cpp \
-    IO/objectio.cpp
+    IO/objectio.cpp \
+    Models/advancedrotator.cpp \
+    Models/pixelcount.cpp \
+    Models/simulationthread.cpp
 
 HEADERS  += mainwindow.h \
     Models/object.h \
@@ -39,7 +42,10 @@ HEADERS  += mainwindow.h \
     JavaScript/javascriptgripper.h \
     JavaScript/javascriptevaluator.h \
     JavaScript/javascriptconsole.h \
-    IO/objectio.h
+    IO/objectio.h \
+    Models/advancedrotator.h \
+    Models/pixelcount.h \
+    Models/simulationthread.h
 
 FORMS    += mainwindow.ui \
     JavaScript/javascriptconsole.ui
@@ -56,3 +62,9 @@ OTHER_FILES += \
 
 RESOURCES += \
     shapes.qrc
+
+DISTFILES += \
+    test/scripts/rotateAroundCenterTest.js \
+    test/scripts/Convex hull around origin.js \
+    test/scripts/Convex hull around origin.js \
+    test/scripts/Convex hull around origin.js

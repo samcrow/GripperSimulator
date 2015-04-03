@@ -1,10 +1,11 @@
 #include "scorecalculator.h"
+#include "pixelcount.h"
 #include <cmath>
 #include <QDebug>
 
 ScoreCalculator::ScoreCalculator(Gripper &gripper, ObjectInformation& objectInfo, QObject *parent) :
     QObject(parent),
-    gripper(gripper),
+	gripper(gripper),
     objectInfo(objectInfo)
 {
     // Set initial gripper positions
@@ -18,7 +19,7 @@ ScoreCalculator::ScoreCalculator(Gripper &gripper, ObjectInformation& objectInfo
 void ScoreCalculator::gripperGeometryChanged() {
     updateMovmementScore();
     updateInformationScore();
-
+	updatePixels();
     emit scoreChanged();
 }
 
@@ -30,7 +31,7 @@ void ScoreCalculator::updateInformationScore() {
     for(int x = 0; x < image.width(); x++) {
         for(int y = 0; y < image.height(); y++) {
             const QRgb color = image.pixel(x, y);
-            if((color & 1) == 1) {
+			if(isWhite(color)) {
                 clearPixels++;
             }
         }
@@ -38,6 +39,15 @@ void ScoreCalculator::updateInformationScore() {
 
     informationScore_ = clearPixels * PIXEL_SCORE;
 }
+
+void ScoreCalculator::updatePixels() {
+	contPixels_ = PixelCount::countBlackPixels(objectInfo.bitmap(), objectInfo.bitmap().width() / 2, objectInfo.bitmap().height() / 2);
+	if(contPixels_ == 0) {
+		// Try somewhere else
+		contPixels_ = PixelCount::countBlackPixels(objectInfo.bitmap(), objectInfo.bitmap().width() * 0.6, objectInfo.bitmap().height() / 2);
+	}
+}
+
 
 void ScoreCalculator::updateMovmementScore() {
     const double newX = gripper.xOffset();
@@ -70,4 +80,12 @@ int ScoreCalculator::movementScore() const {
 
 int ScoreCalculator::informationScore() const {
     return std::round(informationScore_);
+}
+
+int ScoreCalculator::pixels() const {
+	return contPixels_;
+}
+
+bool ScoreCalculator::isWhite(QRgb color) {
+	return (color & 1) == 1;
 }

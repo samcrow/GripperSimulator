@@ -1,6 +1,7 @@
 #include "simulation.h"
 #include "../IO/objectio.h"
 #include <QDebug>
+#include <QThread>
 #include <QFile>
 #include <QtMath>
 #include <QCoreApplication>
@@ -9,7 +10,7 @@
 
 Simulation::Simulation(QObject* parent) :
     QObject(parent),
-    scoreCalculator_(gripper_, info_),
+	scoreCalculator_(gripper_, info_),
     scripting(*this)
 {
 	// Load a shape
@@ -19,13 +20,25 @@ Simulation::Simulation(QObject* parent) :
 
     connect(&gripper_, &Gripper::geometryChanged, this, &Simulation::check);
 
-    connect(&xChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setXOffset(newValue); });
-    connect(&yChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setYOffset(newValue); });
-    connect(&openChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setOpenDistance(newValue); });
-    connect(&angleChanger, &LinearValueChanger::valueChanged, [this](double newValue) { gripper_.setAngle(newValue); });
+	connect(&xChanger, &LinearValueChanger::valueChanged,
+			[this](double newValue) { gripper_.setXOffset(newValue); });
+	connect(&yChanger, &LinearValueChanger::valueChanged,
+			[this](double newValue) { gripper_.setYOffset(newValue); });
+	connect(&openChanger, &LinearValueChanger::valueChanged,
+			[this](double newValue) { gripper_.setOpenDistance(newValue); });
+	connect(&angleChanger, &LinearValueChanger::valueChanged,
+			[this](double newValue) { gripper_.setAngle(newValue); });
+	connect(&advancedRotator, &AdvancedRotator::newPosition,
+		[this](const QPointF& newPosition) {
+		gripper_.setXOffset(newPosition.x()); gripper_.setYOffset(newPosition.y());
+	});
 
-    connect(&gripper_, &Gripper::geometryChanged, &scoreCalculator_, &ScoreCalculator::gripperGeometryChanged);
-    connect(&scoreCalculator_, &ScoreCalculator::scoreChanged, this, &Simulation::emitScoreChanged);
+	connect(&gripper_, &Gripper::geometryChanged, &scoreCalculator_,
+			&ScoreCalculator::gripperGeometryChanged);
+	connect(&scoreCalculator_, &ScoreCalculator::scoreChanged, this,
+			&Simulation::scoreChangedInternal);
+
+	advancedRotator.setCenter(QPointF(0, 0));
 }
 
 void Simulation::rotateGripperLeft() {
@@ -80,6 +93,7 @@ void Simulation::stopMovingGripper() {
     yChanger.pause();
     angleChanger.pause();
     openChanger.pause();
+	advancedRotator.pause();
 }
 void Simulation::startMovingGripperLeft() {
     xChanger.setValue(gripper_.xOffset());
@@ -164,11 +178,25 @@ void Simulation::startRotatingGripperClockwise() {
 }
 void Simulation::stopRotatingGripper() {
     angleChanger.pause();
+	advancedRotator.pause();
+}
+
+void Simulation::startRotatingGripperClockwiseAroundOrigin() {
+	advancedRotator.setPosition(QPointF(gripper_.xOffset(), gripper_.yOffset()));
+	advancedRotator.setRate(ROTATE_RATE);
+	advancedRotator.start();
+	startRotatingGripperClockwise();
+}
+void Simulation::startRotatingGripperCounterclockwiseAroundOrigin() {
+	advancedRotator.setPosition(QPointF(gripper_.xOffset(), gripper_.yOffset()));
+	advancedRotator.setRate(-ROTATE_RATE);
+	advancedRotator.start();
+	startRotatingGripperCounterclockwise();
 }
 void Simulation::startOpeningGripper() {
-    openChanger.setValue(gripper_.openDistance());
-    openChanger.setRate(MOVE_RATE);
-    openChanger.start();
+	openChanger.setValue(gripper_.openDistance());
+	openChanger.setRate(MOVE_RATE);
+	openChanger.start();
 }
 void Simulation::startClosingGripper() {
     openChanger.setValue(gripper_.openDistance());
@@ -180,6 +208,7 @@ void Simulation::stopOpeningClosingGripper() {
 }
 
 void Simulation::moveGripperToCenter() {
+	stopMovingGripper();
     // Set X and Y rates to arrive at the center simultaneously
     const double angle = std::atan2(gripper_.yOffset(), gripper_.xOffset());
     const double xRate = -MOVE_RATE * std::cos(angle);
@@ -195,12 +224,12 @@ void Simulation::moveGripperToCenter() {
     // Check for a return to zero
     bool xDone = false;
     bool yDone = false;
-    while(!xDone && !yDone) {
-        if(std::abs(gripper_.xOffset()) <= 0.001) {
+	while(!xDone || !yDone) {
+		if(std::abs(gripper_.xOffset()) <= 0.0001) {
             xDone = true;
             xChanger.pause();
         }
-        if(std::abs(gripper_.yOffset()) <= 0.001) {
+		if(std::abs(gripper_.yOffset()) <= 0.0001) {
             yDone = true;
             yChanger.pause();
         }
@@ -256,7 +285,7 @@ void Simulation::checkCollisions() {
     }
 
     if(collided) {
-
+		// Do nothing
     }
     else {
         // Mark the areas around the fingertips as clear
@@ -293,7 +322,28 @@ bool Simulation::collides(const QPolygonF& p1, const QPolygonF& p2) {
 }
 
 void Simulation::reset() {
+	stopSimulation();
 	gripper_.reset();
 	info_.reset();
 }
 
+void Simulation::startSimulation() {
+	if(scripting.hasScriptFile()) {
+		scripting.executeScriptFile();
+	}
+}
+
+void Simulation::stopSimulation() {
+	// Not implemented in single-thread configuration
+}
+
+void Simulation::scoreChangedInternal() {
+
+	const int objectPixels = info_.countPixels(object_.polygon());
+	pixelDifference_ = scoreCalculator_.pixels() - objectPixels;
+	emit scoreChanged();
+}
+
+int Simulation::pixelDifference() const {
+	return pixelDifference_;
+}

@@ -1,12 +1,11 @@
 
 Investigate:
 
-✓ Moving the gripper in a coordinate system based on its rotation
+Try lots of shapes, try to find failures
+Failure means: collision, inaccurate shape
 
-✓ Loading a bitmap for the object (not currently implemented as a bitmap)
+Try one horizontal sweep and one vertical sweep to get a bounding box
 
-Script for edge/corner finding
+Detect off-center objects?
 
-Script for reconstructing convex objects
-
-Test scripts on a variety of objects
+Computational geometry/art gallery problem

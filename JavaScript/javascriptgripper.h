@@ -54,6 +54,9 @@ public slots:
     void startRotatingCounterclockwise();
     void startRotatingClockwise();
 
+	void startRotatingCounterclockwiseAroundOrigin();
+	void startRotatingClockwiseAroundOrigin();
+
     void moveToCenter();
 
     void stop();

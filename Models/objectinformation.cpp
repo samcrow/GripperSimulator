@@ -26,11 +26,31 @@ void ObjectInformation::markClear(const QPolygonF &polygon)
 
 void ObjectInformation::markClear(const QLineF& line)
 {
-    QPainter painter(&bitmap_);
-    painter.setPen(Qt::white);
-    painter.drawLine(transform.map(line));
+	QPainter painter(&bitmap_);
+	painter.setPen(Qt::white);
+	painter.drawLine(transform.map(line));
 }
 
 void ObjectInformation::reset() {
 	bitmap_.fill(0);
+}
+
+int ObjectInformation::countPixels(const QPolygonF& polygon) const {
+	QImage image(bitmap_.size(), bitmap_.format());
+	image.fill(0);
+
+	QPainter painter(&image);
+	painter.setBrush(Qt::white);
+	painter.drawPolygon(transform.map(polygon));
+
+	int sum = 0;
+	for(int x = 0; x < image.width(); x++) {
+		for(int y = 0; y < image.height(); y++) {
+			const QRgb pixel = image.pixel(x, y);
+			if((pixel & 1) == 1) {
+				sum++;
+			}
+		}
+	}
+	return sum;
 }

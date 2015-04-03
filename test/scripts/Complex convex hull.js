@@ -11,7 +11,7 @@ function rotateCounterclockwiseTo(angle) {
 }
 
 
-function findEdges() {
+function findCorner() {
     gripper.startMovingPositiveV();
     while(gripper.beamBlocked) { yield(); }
     gripper.moveToCenter();
@@ -22,9 +22,23 @@ function findEdges() {
     gripper.moveToCenter();
 }
 
-// Rotate in 45º increments
-for(var angle = 0; angle < Math.PI; angle += Math.PI * 0.25) {
+// Rotate in increments
+var increment = Math.PI * 0.125;
+var angle = 0;
+while(angle < Math.PI * 2) {
+    // Each time, move V+ until the beam is not blocked
+    // Then rotate to the next increment and move back to the center
+
+    gripper.startMovingPositiveV();
+    while(gripper.beamBlocked) { yield(); }
+    gripper.stop();
+
+    angle += increment;
     console.log('Rotating to ' + angle)
     rotateCounterclockwiseTo(angle);
-    findEdges();
+
+    console.log("moving to center...");
+    gripper.moveToCenter();
+    console.log("Done moving to center");
+
 }

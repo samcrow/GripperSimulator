@@ -76,6 +76,13 @@ void JavaScriptGripper::startRotatingClockwise() {
     simulation.startRotatingGripperClockwise();
 }
 
+void JavaScriptGripper::startRotatingCounterclockwiseAroundOrigin() {
+	simulation.startRotatingGripperCounterclockwiseAroundOrigin();
+}
+void JavaScriptGripper::startRotatingClockwiseAroundOrigin() {
+	simulation.startRotatingGripperClockwiseAroundOrigin();
+}
+
 bool JavaScriptGripper::isBeamBlocked() const {
     return simulation.isBeamBlocked();
 }

@@ -6,6 +6,8 @@
 #include "object.h"
 #include "objectinformation.h"
 #include "scorecalculator.h"
+#include "advancedrotator.h"
+#include "simulationthread.h"
 #include "../JavaScript/javascriptevaluator.h"
 
 /**
@@ -38,10 +40,12 @@ public:
     Object& object();
     ObjectInformation& objectInformation();
     ScoreCalculator& scoreCalculator();
-    JavaScriptEvaluator& scriptEvaluator();
+	JavaScriptEvaluator& scriptEvaluator();
 
     /// Returns whether the infrared beam is blocked by an object
     bool isBeamBlocked() const;
+
+	int pixelDifference() const;
 
 public slots:
     void rotateGripperRight();
@@ -69,6 +73,9 @@ public slots:
     void startRotatingGripperCounterclockwise();
     void stopRotatingGripper();
 
+	void startRotatingGripperClockwiseAroundOrigin();
+	void startRotatingGripperCounterclockwiseAroundOrigin();
+
     void startOpeningGripper();
     void startClosingGripper();
     void stopOpeningClosingGripper();
@@ -84,15 +91,18 @@ public slots:
 	 */
 	void reset();
 
+	void startSimulation();
+	void stopSimulation();
+
 private slots:
 
-    inline void emitScoreChanged() { emit scoreChanged(); }
+	void scoreChangedInternal();
 
 signals:
 
     void changed();
 
-    void scoreChanged();
+	void scoreChanged();
 
 private:
     Gripper gripper_;
@@ -106,13 +116,19 @@ private:
     LinearValueChanger yChanger;
     LinearValueChanger angleChanger;
     LinearValueChanger openChanger;
+	AdvancedRotator advancedRotator;
 
     bool beamBlocked_ = true;
 
+	int pixelDifference_;
+
+	SimulationThread* thread = nullptr;
+	QThread* mainThread = nullptr;
+
     /// Gripper move rate, meters/second
-    static constexpr double MOVE_RATE = 0.01;
+	static constexpr double MOVE_RATE = 0.02;
     /// Gripper rotation rate, radians/second
-    static constexpr double ROTATE_RATE = 0.2;
+	static constexpr double ROTATE_RATE = 0.4;
 
     void checkCollisions();
     void checkInfraredBeam();

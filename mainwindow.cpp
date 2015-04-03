@@ -25,7 +25,11 @@ MainWindow::MainWindow(Simulation* simulation, QWidget *parent) :
 
 void MainWindow::updateScoreDisplay() {
     std::stringstream stream;
-    stream << "Total score " << simulation->scoreCalculator().netScore() << " (movement " << simulation->scoreCalculator().movementScore() << ", information " << simulation->scoreCalculator().informationScore() << ")";
+	stream << "Total score " << simulation->scoreCalculator().netScore()
+		   << " (movement " << simulation->scoreCalculator().movementScore()
+		   << ", information " << simulation->scoreCalculator().informationScore()
+		   << ", pixels " << simulation->scoreCalculator().pixels()
+		   << ", difference " << simulation->pixelDifference()  << ")";
     ui->statusBar->showMessage(QString::fromStdString(stream.str()));
 }
 
@@ -155,12 +159,8 @@ void MainWindow::on_closeButton_released() {
 
 void MainWindow::on_runScriptButton_clicked()
 {
-    if(simulation->scriptEvaluator().hasScriptFile()) {
-		simulation->reset();
-        const QScriptValue result = simulation->scriptEvaluator().executeScriptFile();
-        if(result.isError()) {
-			ui->statusBar->showMessage(result.toString(), 5000);
-        }
+	if(simulation->scriptEvaluator().hasScriptFile()) {
+		simulation->startSimulation();
     }
 }
 
