@@ -12,6 +12,8 @@ This software is licensed under the MIT license (see LICENSE.txt).
 
 Gripper Simulator can be compiled on many platforms with the [Qt](http://www.qt.io/developers/) libraries and tools. Version 5.0 or later of Qt should work.
 
+The compiler being used must support C++11. If that is not feasible, the code can be edited into C++03 with no visible loss of functionality.
+
 ## JavaScript specification ##
 
 JavaScript code has access to a global `gripper` object. This object has functions and properties as described in src/JavaScript/JavaScriptGripper.h
